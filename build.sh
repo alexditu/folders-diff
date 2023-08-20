@@ -30,7 +30,6 @@ build_go_binaries () {
 		# print build command
 		set -x
 
-		# -buildvcs=false 
 		go build -o "${OUT_BIN}" -gcflags="${GCFLAGS}" ${CUSTOM_FLAGS} -trimpath "../${k}"
 
 		set +x
@@ -54,8 +53,8 @@ echo "Building for Linux x64"
 echo -e "\nBuilding debug binaries"
 build_go_binaries "linux" "${BUILDDIR}/linux/bin/amd64/debug" 'all=-N -l'
 
-# echo -e "\nBuilding release binaries"
-# build_go_binaries "linux" "${BUILDDIR}/linux/bin/amd64/release"
+echo -e "\nBuilding release binaries"
+build_go_binaries "linux" "${BUILDDIR}/linux/bin/amd64/release"
 
 
 echo "Building for Windows x64"
@@ -65,5 +64,5 @@ export GOOS=windows GOARCH=amd64
 echo -e "\nBuilding debug binaries"
 build_go_binaries "windows" "${BUILDDIR}/windows/bin/amd64/debug" 'all=-N -l'
 
-# echo -e "\nBuilding release binaries"
-# build_go_binaries "windows" "${BUILDDIR}/windows/bin/amd64/release"
+echo -e "\nBuilding release binaries"
+build_go_binaries "windows" "${BUILDDIR}/windows/bin/amd64/release"

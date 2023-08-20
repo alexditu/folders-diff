@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"os"
 	"os/signal"
@@ -50,7 +51,50 @@ func run(args programArguments) error {
 func generateDiff(ctx context.Context, folderA, folderB string) error {
 	log.Infof("Traversing folderA: %s\n", folderA)
 
-	err := filepath.Walk(folderA, func(path string, info fs.FileInfo, err error) error {
+	folderAContents, err := listAllFiles(ctx, folderA)
+	if err != nil {
+		log.Errorf("failed to traverse folderA '%s': %s\n", folderA, err)
+		return err
+	}
+
+	folderBContents, err := listAllFiles(ctx, folderB)
+	if err != nil {
+		log.Errorf("failed to traverse folderA '%s': %s\n", folderA, err)
+		return err
+	}
+
+	log.Infof("folderA has %d files, folderB has %d files", len(folderAContents), len(folderBContents))
+
+	for k := range folderBContents {
+		delete(folderAContents, k)
+	}
+
+	fmt.Printf("List of files from '%s' not present in '%s' (%d files)\n", folderA, folderB, len(folderAContents))
+	for k := range folderAContents {
+		fmt.Println(k)
+	}
+
+	return nil
+}
+
+type fileInfo struct {
+	path  string
+	isDir bool
+	size  int64
+}
+
+func listAllFiles(ctx context.Context, rootDir string) (map[string]fileInfo, error) {
+	dirContents := make(map[string]fileInfo)
+
+	var err error
+	rootDir, err = filepath.Abs(rootDir)
+
+	if err != nil {
+		log.Errorf("failed to get absolute path for rootDir '%s': %s", rootDir, err)
+		return nil, err
+	}
+
+	err = filepath.Walk(rootDir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			log.Errorf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
 			return err
@@ -61,15 +105,23 @@ func generateDiff(ctx context.Context, folderA, folderB string) error {
 			return fs.SkipAll
 		}
 
-		log.Infof("visited file or dir: %q\n", path)
+		pathKey := path
+		if info.IsDir() {
+			pathKey += "/"
+		}
+
+		dirContents[pathKey] = fileInfo{path, info.IsDir(), info.Size()}
 
 		return nil
 	})
 
+	// we don't need the rootDir entry, it doesn't make sense since it will always be different
+	delete(dirContents, rootDir)
+	delete(dirContents, rootDir+"/")
+
 	if err != nil {
-		log.Errorf("error walking the path %q: %v\n", folderA, err)
-		return err
+		return nil, err
 	}
 
-	return nil
+	return dirContents, err
 }
