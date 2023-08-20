@@ -46,9 +46,7 @@ mkdir -p "${BUILDDIR}"
 cd "${BUILDDIR}" || exit 1
 
 # Build for Linux
-echo -e "\n"
-
-echo "Building for Linux x64"
+echo -e "\n\n#### Building for Linux amd64 ####"
 
 echo -e "\nBuilding debug binaries"
 build_go_binaries "linux" "${BUILDDIR}/linux/bin/amd64/debug" 'all=-N -l'
@@ -56,8 +54,8 @@ build_go_binaries "linux" "${BUILDDIR}/linux/bin/amd64/debug" 'all=-N -l'
 echo -e "\nBuilding release binaries"
 build_go_binaries "linux" "${BUILDDIR}/linux/bin/amd64/release"
 
-
-echo "Building for Windows x64"
+# Build for Windows
+echo -e "\n\n#### Building for Windows amd64 ####"
 # for full list run command: go tool dist list
 export GOOS=windows GOARCH=amd64
 
