@@ -57,9 +57,11 @@ func generateDiff(ctx context.Context, folderA, folderB string) error {
 		return err
 	}
 
+	log.Infof("Traversing folderB: %s\n", folderB)
+
 	folderBContents, err := listAllFiles(ctx, folderB)
 	if err != nil {
-		log.Errorf("failed to traverse folderA '%s': %s\n", folderA, err)
+		log.Errorf("failed to traverse folderA '%s': %s\n", folderB, err)
 		return err
 	}
 
