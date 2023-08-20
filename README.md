@@ -1,5 +1,5 @@
 # folders-diff
-Recursively traverse two directories and print the differences.
+Recursively traverse two directories and print the files from 1st directory that are not present in the 2nd directory
 
 Created this short program to improve my golang knwoledge while also helping a friend to double check which files weren't backed up from his old hard drives :).
 
